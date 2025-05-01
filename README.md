@@ -47,3 +47,5 @@ This project is licensed under the MIT License.
 
 - Add tests
 - keep style of excel sheets
+- Add emailing
+- Send dynamically and automatically

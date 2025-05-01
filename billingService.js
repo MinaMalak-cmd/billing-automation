@@ -1,5 +1,4 @@
 // Here we handle logic related to billing and payment processing regarding reading and generating invoices
-// const { readFileSync, writeFileXLSX } = require("xlsx");
 const XLSX = require("xlsx");
 const fse = require("fs-extra");
 const path = require("path");
@@ -7,12 +6,6 @@ const path = require("path");
 const EMPLOYEE_FILE = path.join("templates", "employees.xlsx");
 const TEMPLATE_FILE = path.join("templates", "billing.xlsx");
 const OUTPUT_DIR = "outputs";
-
-function excelSerialToDate(serial) {
-  const excelEpoch = new Date(Date.UTC(1899, 11, 30)); // Excel base date
-  const millis = serial * 86400 * 1000;
-  return new Date(excelEpoch.getTime() + millis);
-}
 
 async function generateBillingSheets() {
   await fse.ensureDir(OUTPUT_DIR);
@@ -67,5 +60,4 @@ async function generateBillingSheets() {
 
   return fse.readdir(OUTPUT_DIR);
 }
-console.log("generateBillingSheets", generateBillingSheets());
 module.exports = { generateBillingSheets };
