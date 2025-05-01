@@ -1,0 +1,19 @@
+{
+  "name": "billing-automation",
+  "version": "1.0.0",
+  "description": "## Project Overview This Node.js project automates the process of generating and sending billing sheets for team members. It is designed to streamline the monthly billing process by creating individual billing sheets for each employee and emailing them to the billing team.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "fs-extra": "^11.3.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
+    "xlsx": "^0.18.5"
+  }
+}
