@@ -37,6 +37,7 @@ async function generateBillingSheets() {
     const currentDate = new Date();
 
     // Calculate months difference
+    console.log("joiningDate", joiningDate);
     const years = currentDate.getFullYear() - joiningDate.getFullYear();
     const months = currentDate.getMonth() - joiningDate.getMonth();
 

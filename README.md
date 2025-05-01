@@ -45,6 +45,6 @@ This project is licensed under the MIT License.
 
 ## To do
 
-- Add github repo
 - Add tests
--
+- Format invoice number
+- keep style of excel sheets
