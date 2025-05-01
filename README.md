@@ -45,7 +45,7 @@ This project is licensed under the MIT License.
 
 ## To do
 
+- In readEmployees function replace xlsx by xlsx-populate
 - Add tests
-- keep style of excel sheets
 - Add emailing
 - Send dynamically and automatically
