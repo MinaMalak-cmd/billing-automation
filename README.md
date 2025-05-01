@@ -47,5 +47,6 @@ This project is licensed under the MIT License.
 
 - In readEmployees function replace xlsx by xlsx-populate
 - Add tests
-- Add emailing
+- Add emailService
+  - Add security, Auth, and HTTPS
 - Send dynamically and automatically
