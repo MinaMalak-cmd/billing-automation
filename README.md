@@ -1,21 +1,21 @@
-# Billing Automation
+# Invoice Automation
 
 ## Project Overview
 
-This Node.js project automates the process of generating and sending billing sheets for team members. It is designed to streamline the monthly billing process by creating individual billing sheets for each employee and emailing them to the billing team.
+This Node.js project automates the process of generating and sending invoice sheets for team members. It is designed to streamline the monthly invoice process by creating individual invoice sheets for each employee and emailing them to the invoice team.
 
 ## Features
 
-- **Excel Sheet Modification**: Reads employee data (name, salary, joining date) from a master sheet and generates a billing sheet for each employee.
+- **Excel Sheet Modification**: Reads employee data (name, salary, joining date) from a master sheet and generates a invoice sheet for each employee.
 - **Automated Monthly Execution**: The process is scheduled to run automatically every month using Node.js scheduling libraries.
-- **Email Integration**: Sends the generated billing sheets to the billing team via email using an email-sending library (e.g., Nodemailer).
+- **Email Integration**: Sends the generated invoice sheets to the invoice team via email using an email-sending library (e.g., Nodemailer).
 - **Scalability**: Applies to all team members, ensuring no manual intervention is required.
 
 ## How It Works
 
 1. **Data Input**: Reads employee details from a master Excel sheet using a library like `xlsx`.
-2. **Billing Sheet Generation**: Creates a personalized billing sheet for each employee.
-3. **Email Dispatch**: Sends the generated billing sheets to the billing team via email.
+2. **Invoice Sheet Generation**: Creates a personalized invoice sheet for each employee.
+3. **Email Dispatch**: Sends the generated invoice sheets to the invoice team via email.
 4. **Automation**: Uses a scheduler (e.g., `node-cron`) to ensure the process runs monthly without manual triggers.
 
 ## Prerequisites
@@ -49,4 +49,7 @@ This project is licensed under the MIT License.
 - Add tests
 - Add emailService
   - Add security, Auth, and HTTPS
+- Refactor all code
+  - create config.json file for main configs
+  - add all variables into config.json and .env
 - Send dynamically and automatically

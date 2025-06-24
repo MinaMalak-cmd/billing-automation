@@ -1,11 +1,13 @@
 const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
 const fs = require("fs-extra");
 const path = require("path");
 require("dotenv").config();
 
 const OUTPUT_DIR = path.join(__dirname, "outputs");
 
-// Get all generated billing files
+const envVars = process.env;
+// Get all generated invoice files
 const files = fs
   .readdirSync(OUTPUT_DIR)
   .filter((file) => file.endsWith(".xlsx"))
@@ -28,8 +30,8 @@ async function sendBillingEmails(files) {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_TO,
-    subject: "Monthly Billing Sheets",
-    text: "Attached are the billing sheets for this month.",
+    subject: "Monthly Invoice Sheets",
+    text: "Attached are the invoice sheets for this month.",
     attachments,
     // cc
   };

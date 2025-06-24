@@ -1,4 +1,4 @@
-// Here we handle logic related to billing and payment processing regarding reading and generating invoices
+// Here we handle logic related to invoice and payment processing regarding reading and generating invoices
 const XLSX = require("xlsx");
 const fse = require("fs-extra");
 const path = require("path");
@@ -10,7 +10,7 @@ const {
 } = require("./utils/excelUtils");
 
 const EMPLOYEE_FILE = path.join("templates", "employees.xlsx");
-const TEMPLATE_FILE = path.join("templates", "billing.xlsx");
+const TEMPLATE_FILE = path.join("templates", "invoice.xlsx");
 const OUTPUT_DIR = "outputs";
 
 const options = {
@@ -28,7 +28,7 @@ function readEmployees() {
   const employees = XLSX.utils.sheet_to_json(employeeSheet);
   return employees;
 }
-async function generateBillingSheets() {
+async function generateInvoiceSheets() {
   await fse.ensureDir(OUTPUT_DIR);
 
   for (const emp of readEmployees()) {
@@ -44,7 +44,8 @@ async function generateBillingSheets() {
     sheet.cell("H35").value(emp.Salary).style("numberFormat", "$  #,##0.00");
     sheet.cell("F39").value(emp.Name);
 
-    const fileName = `billing_${emp.Name.replace(/\s+/g, "_")}.xlsx`;
+    const monthName = new Date().toLocaleString("default", { month: "long" });
+    const fileName = `invoice_${emp.Name.replace(/\s+/g, "_")}_${monthName}.xlsx`;
     const filePath = path.join(OUTPUT_DIR, fileName);
 
     await workbook.toFileAsync(filePath);
@@ -52,7 +53,6 @@ async function generateBillingSheets() {
 
   return fse.readdir(OUTPUT_DIR);
 }
+console.log("Invoice sheets generated successfully!", generateInvoiceSheets());
 
-console.log("Billing sheets generated successfully!", generateBillingSheets());
-
-module.exports = { generateBillingSheets };
+module.exports = { generateInvoiceSheets };
