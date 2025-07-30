@@ -3,6 +3,7 @@ const XLSX = require("xlsx");
 const fse = require("fs-extra");
 const path = require("path");
 const XlsxPopulate = require("xlsx-populate");
+const { getCurrentMonth } = require("./utils/utils.js");
 
 const {
   calculateFirstDayOfMonth,
@@ -44,8 +45,7 @@ async function generateInvoiceSheets() {
     sheet.cell("H35").value(emp.Salary).style("numberFormat", "$  #,##0.00");
     sheet.cell("F39").value(emp.Name);
 
-    const monthName = new Date().toLocaleString("default", { month: "long" });
-    const fileName = `invoice_${emp.Name.replace(/\s+/g, "_")}_${monthName}.xlsx`;
+    const fileName = `invoice_${emp.Name.replace(/\s+/g, "_")}_${getCurrentMonth()}.xlsx`;
     const filePath = path.join(OUTPUT_DIR, fileName);
 
     await workbook.toFileAsync(filePath);

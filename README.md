@@ -45,11 +45,14 @@ This project is licensed under the MIT License.
 
 ## To do
 
-- In readEmployees function replace xlsx by xlsx-populate
+- In readEmployees function replace xlsx by xlsx-populate [Done]
 - Add tests
-- Add emailService
+- Add emailService [Done]
   - Add security, Auth, and HTTPS
+  - Add CC, BCC
 - Refactor all code
+
   - create config.json file for main configs
   - add all variables into config.json and .env
+
 - Send dynamically and automatically
