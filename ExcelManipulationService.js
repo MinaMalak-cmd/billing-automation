@@ -53,6 +53,5 @@ async function generateInvoiceSheets() {
 
   return fse.readdir(OUTPUT_DIR);
 }
-console.log("Invoice sheets generated successfully!", generateInvoiceSheets());
 
 module.exports = { generateInvoiceSheets };

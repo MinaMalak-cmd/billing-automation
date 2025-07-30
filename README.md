@@ -32,6 +32,15 @@ This Node.js project automates the process of generating and sending invoice she
 
 ## Usage
 
+- Add your env file, here's an example
+
+```env
+EMAIL_USER=your_email@domain.com
+EMAIL_PASS=your_pass
+EMAIL_TO=email_to
+EMAIL_CC=email_cc
+```
+
 - To run the process manually: `node index.js`.
 - To ensure monthly automation, verify the scheduler is correctly configured.
 
@@ -55,4 +64,5 @@ This project is licensed under the MIT License.
   - create config.json file for main configs
   - add all variables into config.json and .env
 
+- Update all env variables
 - Send dynamically and automatically

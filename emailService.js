@@ -2,24 +2,15 @@ const nodemailer = require("nodemailer");
 const fs = require("fs-extra");
 const path = require("path");
 const { getCurrentMonth } = require("./utils/utils.js");
-
 require("dotenv").config();
 
-const OUTPUT_DIR = path.join(__dirname, "outputs");
-console.log('OUTPUT_DIR:', OUTPUT_DIR);
-
-const envVars = process.env;
-console.log('Environment Variables:', {
-  EMAIL_USER: envVars.EMAIL_USER,
-  EMAIL_TO: envVars.EMAIL_TO,
-});
-// // Get all generated invoice files
-const files = fs
-  .readdirSync(OUTPUT_DIR)
-  .filter((file) => file.endsWith(".xlsx"))
-  .map((file) => path.join(OUTPUT_DIR, file));
-
 async function sendBillingEmails() {
+  // Get all generated invoice files
+  const OUTPUT_DIR = path.join(__dirname, "outputs");
+  const files = fs
+    .readdirSync(OUTPUT_DIR)
+    .filter((file) => file.endsWith(".xlsx"))
+    .map((file) => path.join(OUTPUT_DIR, file));
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -32,18 +23,15 @@ async function sendBillingEmails() {
     filename: file.split("/").splice(-1)[0], // Get the file name from the path
     path: file,
   }));
-  console.log('Attachments:', attachments);
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_TO,
     subject: `Monthly Invoice Sheets - ${getCurrentMonth()}`,
     text: "Attached are the invoice sheets for this month.",
     attachments,
-    // cc
+    cc: process.env.EMAIL_CC || "",
   };
 
   await transporter.sendMail(mailOptions);
-  console.log("Emails sent successfully.");
 }
-console.log("Starting to send billing emails...", sendBillingEmails());
 module.exports = { sendBillingEmails };
