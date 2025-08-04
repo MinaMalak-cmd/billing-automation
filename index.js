@@ -41,7 +41,11 @@ async function removeFilesInOutputDirectory() {
 // Run immediately (useful for Lambda or manual testing)
 // runMonthlyTask();
 
-// Uncomment below 
+/*  
+The cron job is set to run on the 24th of every month at 9:00 AM (local time).
+When testing locally, but on Lambda you can handle this using cloudwatch trigger 
+*/
+/*
 const everyMonth24th9AMTrigger = "0 9 24 * *"; // to run it on the 24th of every month at 9:00 AM (local time)
 const everyMinuteTrigger = "* * * * *"; //for testing purposes
 
@@ -55,3 +59,15 @@ cron.schedule(everyMonth24th9AMTrigger, async () => {
         console.error("❌ Error during scheduled task:", err);
     }
 });
+*/
+
+// Here's the code used for Lambda function : 
+exports.handler = async (event) => {
+    try {
+        await runMonthlyTask();
+        await removeFilesInOutputDirectory();
+        console.log("✅ Lambda job finished.");
+    } catch (err) {
+        console.error("❌ Lambda job failed:", err);
+    }
+};
