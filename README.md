@@ -39,6 +39,7 @@ EMAIL_USER=your_email@domain.com
 EMAIL_PASS=your_pass
 EMAIL_TO=email_to
 EMAIL_CC=email_cc
+OUTPUT_TARGET=local
 ```
 
 - To run the process manually: `node index.js`.
@@ -54,15 +55,15 @@ This project is licensed under the MIT License.
 
 ## To do
 
-- In readEmployees function replace xlsx by xlsx-populate [Done]
 - Add tests
-- Add emailService [Done]
   - Add security, Auth, and HTTPS
-  - Add CC, BCC
 - Refactor all code
 
   - create config.json file for main configs
   - add all variables into config.json and .env
 
+- Remove the files in output directory after each job running
+- Receive files from a certain bucket
+- CI/CD
 - Update all env variables
 - Send dynamically and automatically
