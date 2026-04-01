@@ -38,5 +38,13 @@
     "telephone": "442075550987",
     "joiningDate": "2024-03-12",
     "email": "dsmith.payroll@corp.com"
+  },
+  {
+    "name": "mina by json",
+    "email": "mk@gh.com",
+    "salary": "2345",
+    "telephone": "07788",
+    "address": "",
+    "joiningDate": ""
   }
 ]

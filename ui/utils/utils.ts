@@ -1,33 +1,48 @@
 export function getCurrentMonth() {
     return new Date().toLocaleString("default", { month: "long" });
 }
+/**
+ * Retrieves the current date formatted as a string for Excel.
+ * Default format: DD/MM/YYYY
+ * @returns {string} The current date
+ */
+export function calculateTodayDate(): string {
+    const today = new Date();
 
-export function calculateFirstDayOfMonth() {
-    // Calculate date
-    const firstDayOfMonth = new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        1
-    );
-    const formattedDate = `${String(firstDayOfMonth.getDate()).padStart(
-        2,
-        "0"
-    )}/${String(firstDayOfMonth.getMonth() + 1).padStart(
-        2,
-        "0"
-    )}/${firstDayOfMonth.getFullYear()}`;
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = today.getFullYear();
 
-    return formattedDate;
+    return `${day}/${month}/${year}`;
 }
 
-export function calculateInvoiceNo(joiningDate: string) {
-    // Calculate months difference to get invoice no
+/**
+ * Calculates the invoice number based on the number of months
+ * between the joining date and the current date.
+ * * @param joiningDateString - Date string in YYYY-MM-DD format
+ * @returns The total number of months (Invoice No)
+ */
+export function calculateInvoiceNo(joiningDateString: string): string {
+    if (!joiningDateString) return "000";
+
     const currentDate = new Date();
+    const joiningDate = new Date(joiningDateString);
 
-    // Calculate months difference
-    const years = currentDate.getFullYear() - joiningDate.getFullYear();
-    const months = currentDate.getMonth() - joiningDate.getMonth();
-    const invoiceNo = years * 12 + months;
+    // Safety check: Ensure the date is valid
+    if (isNaN(joiningDate.getTime())) {
+        console.error("Invalid joining date provided:", joiningDateString);
+        return "000";
+    }
 
-    return invoiceNo;
+    // Calculate total months difference
+    const yearsDiff = currentDate.getFullYear() - joiningDate.getFullYear();
+    const monthsDiff = currentDate.getMonth() - joiningDate.getMonth();
+
+    let totalMonths = yearsDiff * 12 + monthsDiff;
+
+    // Optional: Ensure invoice number isn't negative if joining date is in the future
+    totalMonths = Math.max(0, totalMonths);
+
+    // Format to 3 digits (e.g., 5 -> "005") to match your UI style
+    return totalMonths.toString().padStart(2, '0');
 }

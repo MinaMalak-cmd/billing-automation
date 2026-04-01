@@ -25,6 +25,7 @@ import employeesData from '../data/employees.json';
 import EmployeeDialog from './employeedialog';
 import {Employee} from '../types/types'
 import {saveEmployeesToFile} from '../actions/saveEmployeesToFile';
+import {processPayrollAndEmail} from '../actions/sendPayroll';
 
 const formatIndex = (index: number) => {
     return (index + 1).toString().padStart(3, '0');
@@ -72,8 +73,10 @@ export default function Employees() {
         console.log('Employees saved successfully');
     }
     const sendMonthlyPayroll = async () => {
-
-    }
+        console.log("Button clicked...");
+        const result = await processPayrollAndEmail();
+        console.log("Result received:", result);
+    };
 
     return (
         <>
