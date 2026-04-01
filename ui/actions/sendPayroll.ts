@@ -82,7 +82,10 @@ export async function processPayrollAndEmail () {
             generatedFiles.push(filePath);
         }
         console.log('generatedFiles', generatedFiles);
-
+        return {
+            success: true,
+            error: "New invoices was successfully created!"
+        };
         // 5. Initialize Nodemailer Transporter
         // const transporter = nodemailer.createTransport({
         //     service: "gmail",

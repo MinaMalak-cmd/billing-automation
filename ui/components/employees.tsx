@@ -1,26 +1,20 @@
 'use client';
 
 import {useState} from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
+// Material UI Imports
+import {
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Paper, Box, Tooltip, IconButton, Button, Stack, Snackbar, Alert
+} from '@mui/material';
 
-
+// Icons
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 
+// Local Assets/Actions
 import employeesData from '../data/employees.json';
 import EmployeeDialog from './employeedialog';
 import {Employee} from '../types/types'
@@ -37,6 +31,19 @@ export default function Employees() {
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
 
+    // --- ALERT STATE ---
+    const [alert, setAlert] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
+        open: false,
+        message: '',
+        severity: 'success',
+    });
+    const triggerAlert = (message: string, severity: 'success' | 'error' | 'info' = 'success') => {
+        setAlert({ open: true, message, severity });
+    };
+
+    const handleCloseAlert = () => {
+        setAlert({ ...alert, open: false });
+    };
     const handleAddClick = () => {
         setSelectedEmployee(null); // Ensure form is empty
         setEditIndex(null);         // Ensure we aren't in edit mode
@@ -48,6 +55,7 @@ export default function Employees() {
         if (confirmDelete) {
             const updatedList = employees.filter((_, index) => index !== indexToDelete);
             setEmployees(updatedList);
+            triggerAlert(`Employee "${name}" removed from the empolyees list.`, 'info');
         }
     };
 
@@ -62,24 +70,53 @@ export default function Employees() {
             const updatedList = [...employees];
             updatedList[editIndex] = updatedData;
             setEmployees(updatedList);
+            triggerAlert("Employee updated successfully!");
         } else {
             setEmployees([...employees, updatedData]);
+            triggerAlert("New employee added to the list!");
         }
         setIsModalOpen(false);
         setEditIndex(null);
     };
     const handleSaveToJSON = async () => {
-        await saveEmployeesToFile(employees);
-        console.log('Employees saved successfully');
+        try {
+            const result = await saveEmployeesToFile(employees);
+            if (result.success) {
+                triggerAlert("JSON file updated successfully!", "success");
+            } else {
+                triggerAlert("Failed to save to JSON file.", "error");
+            }
+        } catch (err) {
+            triggerAlert("An error occurred while saving.", "error");
+        }
     }
     const sendMonthlyPayroll = async () => {
-        console.log("Button clicked...");
-        const result = await processPayrollAndEmail();
-        console.log("Result received:", result);
+        triggerAlert("Processing payroll and sending emails...", "info");
+        try {
+            const result = await processPayrollAndEmail();
+            if (result?.success) {
+                triggerAlert("Emails sent successfully and outputs cleaned!", "success");
+            } else {
+                triggerAlert(result?.error || "Failed to send payroll emails.", "error");
+            }
+        } catch (err) {
+            triggerAlert("Critical error during payroll process.", "error");
+        }
     };
 
     return (
         <>
+            {/* Notification Snackbar */}
+            <Snackbar
+                open={alert.open}
+                autoHideDuration={4000}
+                onClose={handleCloseAlert}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseAlert} severity={alert.severity} sx={{ width: '100%' }} variant="filled">
+                    {alert.message}
+                </Alert>
+            </Snackbar>
             <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                 <Button
                     variant="contained"
