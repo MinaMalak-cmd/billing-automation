@@ -20,7 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 
-import employeesData from '../empolyees.json';
+import employeesData from '../data/employees.json';
 import EmployeeDialog from './employeedialog';
 import {Employee} from '../types/types'
 import {saveEmployeesToFile} from '../actions/actions';
@@ -66,8 +66,9 @@ export default function Employees() {
         setIsModalOpen(false);
         setEditIndex(null);
     };
-    const handleSaveToJSON = () => {
-        saveEmployeesToFile(employees);
+    const handleSaveToJSON = async () => {
+        await saveEmployeesToFile(employees);
+        console.log('Employees saved successfully');
     }
 
     return (
