@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Mina Malak",
+    "salary": 1667,
+    "address": "1 Amin Hamada, Ezbet El Nakhl, Cairo",
+    "telephone": "1226530946",
+    "joiningDate": "2024-08-01",
+    "email": "mina.malak@nexspec.com"
+  },
+  {
+    "name": "Sarah Johnson",
+    "salary": 2500,
+    "address": "45 Park Avenue, New York, NY",
+    "telephone": "2125550198",
+    "joiningDate": "2023-11-15",
+    "email": "s.johnson@example.com"
+  },
+  {
+    "name": "Robert Chen",
+    "salary": 3200,
+    "address": "789 Maple Drive, Toronto, ON",
+    "telephone": "4165550432",
+    "joiningDate": "2025-01-10",
+    "email": "r.chen@globaltech.net"
+  },
+  {
+    "name": "Elena Rodriguez",
+    "salary": 2100,
+    "address": "Calle Mayor 12, Madrid, ES",
+    "telephone": "34915551234",
+    "joiningDate": "2024-05-22",
+    "email": "elena.rod@services.io"
+  },
+  {
+    "name": "David Smith",
+    "salary": 1950,
+    "address": "10 High Street, London, UK",
+    "telephone": "442075550987",
+    "joiningDate": "2024-03-12",
+    "email": "dsmith.payroll@corp.com"
+  }
+]
