@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,12 +11,19 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import SaveIcon from '@mui/icons-material/Save';
 
 import employeesData from '../empolyees.json';
 import EmployeeDialog from './employeedialog';
 import {Employee} from '../types/types'
+import {saveEmployeesToFile} from '../actions/actions';
 
 const formatIndex = (index: number) => {
     return (index + 1).toString().padStart(3, '0');
@@ -36,14 +43,9 @@ export default function Employees() {
 
     const onDelete = (indexToDelete: number, name: string) => {
         const confirmDelete = window.confirm(`Are you sure you want to remove this employee: ${name}?`);
-
         if (confirmDelete) {
-            // Logic: Keep all employees EXCEPT the one at the clicked index
             const updatedList = employees.filter((_, index) => index !== indexToDelete);
-
-            // Update state and persistence
             setEmployees(updatedList);
-            localStorage.setItem('payroll_db', JSON.stringify(updatedList));
         }
     };
 
@@ -53,23 +55,40 @@ export default function Employees() {
         setIsModalOpen(true);
     };
 
-    // 2. Logic to SAVE the changes
     const handleSaveEmployee = (updatedData: Employee) => {
         if (editIndex !== null) {
-            // Update existing at specific index
             const updatedList = [...employees];
             updatedList[editIndex] = updatedData;
             setEmployees(updatedList);
         } else {
-            // Add new
             setEmployees([...employees, updatedData]);
         }
         setIsModalOpen(false);
         setEditIndex(null);
     };
+    const handleSaveToJSON = () => {
+        saveEmployeesToFile(employees);
+    }
 
     return (
         <>
+            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={handleAddClick}
+                >
+                    Add New Employee
+                </Button>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSaveToJSON}
+                >
+                    Save into JSON
+                </Button>
+            </Stack>
             <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
                 <Table sx={{ minWidth: 650 }} aria-label="employee payroll table">
                     <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
