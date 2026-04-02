@@ -16,7 +16,8 @@ interface Props {
 
 export default function EmployeeDialog({ open, onClose, onSave, initialData }: Props) {
     const [formData, setFormData] = useState<Employee>({
-        name: '', email: '', salary: 0, telephone: '', address: '', joiningDate: ''
+        name: '', email: '', salary: 0, telephone: '', address: '', joiningDate: '',
+        id: ''
     });
 
     // Logic: Sync internal state with props when editing starts

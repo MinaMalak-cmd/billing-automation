@@ -16,8 +16,12 @@ export const metadata: Metadata = {
     },
 };
 
-export default function RootLayout(props) {
-    const { children } = props;
+// FIX: Define the interface for your props
+interface RootLayoutProps {
+    children: React.ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
     return (
         <html lang="en" className={roboto.variable}>
             <body>

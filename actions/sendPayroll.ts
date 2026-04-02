@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 // @ts-ignore
 import XlsxPopulate from 'xlsx-populate';
+// @ts-ignore
 import nodemailer from 'nodemailer';
 import * as XLSX from 'xlsx';
 import {
