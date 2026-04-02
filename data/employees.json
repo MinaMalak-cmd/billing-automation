@@ -27,7 +27,7 @@
     "email": "r.chen@globaltech.net"
   },
   {
-    "id": 6,
+    "id": 4,
     "name": "Elena Rodriguez",
     "salary": 2100,
     "address": "Calle Mayor 12, Madrid, ES",
@@ -36,7 +36,7 @@
     "email": "elena.rod@services.io"
   },
   {
-    "id": 7,
+    "id": 5,
     "name": "David Smith",
     "salary": 1950,
     "address": "10 High Street, London, UK",
