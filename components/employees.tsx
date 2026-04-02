@@ -36,7 +36,7 @@ export default function Employees() {
     console.log('Employees', employees);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-    const [editIndex, setEditIndex] = useState<string | null>(null);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
         open: false,
@@ -62,15 +62,14 @@ export default function Employees() {
         setAlert({ ...alert, open: false });
     };
     const handleAddClick = () => {
-        setSelectedEmployee(null); // Ensure form is empty
-        setEditIndex(null);         // Ensure we aren't in edit mode
+        setSelectedEmployee(null);  // Ensure form is empty
+        setEditingId(null);         // Ensure we aren't in edit mode
         setIsModalOpen(true);
     };
     const onDelete = (id: string, name: string) => {
         const confirmDelete = window.confirm(`Are you sure you want to remove this employee: ${name}?`);
         if (confirmDelete) {
-            const updatedList = employees.filter((employee) => employee.id !== id);
-            setEmployees(updatedList);
+            setEmployees(prev => prev.filter((employee) => employee.id !== id));
             triggerAlert(`Employee "${name}" removed from the empolyees list.`, 'info');
         }
     };
@@ -79,23 +78,25 @@ export default function Employees() {
         if (employeeToEdit) {
             setSelectedEmployee(employeeToEdit);
             // If you still need the array index for updating:
-            setEditIndex(employees.findIndex(emp => emp.id === id));
+            setEditingId(id);
             setIsModalOpen(true);
         }
     };
     const handleSaveEmployee = (updatedData: Employee) => {
-        if (editIndex !== null) {
-            const updatedList = [...employees];
-            updatedList[editIndex] = updatedData;
-            setEmployees(updatedList);
+        if (editingId !== null) {
+            // FIX: Use .map() to update the specific employee by ID
+            setEmployees(prev =>
+                prev.map(emp => emp.id === editingId ? updatedData : emp)
+            );
             triggerAlert("Employee updated successfully!");
         } else {
-            let newEmployee = {...updatedData, id: employees.length + 1};
-            setEmployees([...employees, newEmployee]);
+            // FIX: Generate a unique ID for new employees if the dialog doesn't provide one
+            const newId = updatedData.id || `EMP-${Date.now()}`;
+            setEmployees(prev => [...prev, { ...updatedData, id: newId }]);
             triggerAlert("New employee added to the list!");
         }
         setIsModalOpen(false);
-        setEditIndex(null);
+        setEditingId(null);
     };
     const handleSaveToJSON = async () => {
         try {
@@ -103,11 +104,12 @@ export default function Employees() {
             const result = await saveEmployeesToFile(employees);
             setLoading(false);
             if (result.success) {
-                triggerAlert("JSON file updated successfully!", "success");
+                triggerAlert(`${MODE.toUpperCase()} file updated successfully!`, "success");
             } else {
-                triggerAlert("Failed to save to JSON file.", "error");
+                triggerAlert("Failed to save to file.", "error");
             }
         } catch (err) {
+            setLoading(false);
             triggerAlert("An error occurred while saving.", "error");
         }
     }
