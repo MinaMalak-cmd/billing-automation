@@ -4,7 +4,8 @@ import {useState, useEffect} from 'react';
 // Material UI Imports
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, Box, Tooltip, IconButton, Button, Stack, Snackbar, Alert
+    Paper, Box, Tooltip, IconButton, Button, Stack, Snackbar, Alert,
+    TextField, Typography
 } from '@mui/material';
 
 // Icons
@@ -43,6 +44,21 @@ export default function Employees() {
         message: '',
         severity: 'success',
     });
+    const [toEmails, setToEmails] = useState<string>("");
+    const [ccEmails, setCcEmails] = useState<string>("");
+
+    // Save to Local Storage whenever they change
+    useEffect(() => {
+        localStorage.setItem('payroll_to', toEmails);
+        localStorage.setItem('payroll_cc', ccEmails);
+    }, [toEmails, ccEmails]);
+    // Load from Local Storage on Mount
+    useEffect(() => {
+        const savedTo = localStorage.getItem('payroll_to');
+        const savedCc = localStorage.getItem('payroll_cc');
+        if (savedTo) setToEmails(savedTo);
+        if (savedCc) setCcEmails(savedCc);
+    }, []);
 
     useEffect(() => {
         const loadData = async () => {
@@ -114,9 +130,18 @@ export default function Employees() {
         }
     }
     const sendMonthlyPayroll = async () => {
+        if (!toEmails) {
+            triggerAlert("Please enter at least one recipient in 'To'", "error");
+            return;
+        }
+
+        // Convert strings to arrays
+        const toArray = toEmails.split(',').map(e => e.trim()).filter(e => e);
+        const ccArray = ccEmails.split(',').map(e => e.trim()).filter(e => e);
+
         triggerAlert(`Processing payroll via ${MODE}...`, "info");
         try {
-            const result = await processPayrollAndEmail(MODE);
+            const result = await processPayrollAndEmail(MODE, toArray, ccArray);
             if (result?.success) {
                 triggerAlert("Emails sent successfully and outputs cleaned!", "success");
             } else {
@@ -139,6 +164,29 @@ export default function Employees() {
                     {alert.message}
                 </Alert>
             </Snackbar>
+            <Stack spacing={2} sx={{ mb: 3, p: 2, border: '1px solid #ddd', borderRadius: 2 }}>
+                <Typography variant="subtitle2">Email Settings (Saved Locally)</Typography>
+                <Stack direction="row" spacing={2}>
+                    <TextField
+                        fullWidth
+                        label="To (comma separated)"
+                        variant="outlined"
+                        size="small"
+                        value={toEmails}
+
+                        onChange={(e) => setToEmails(e.target.value)}
+                        placeholder="boss@company.com, HR@company.com"
+                    />
+                    <TextField
+                        fullWidth
+                        label="CC (comma separated)"
+                        variant="outlined"
+                        size="small"
+                        value={ccEmails}
+                        onChange={(e) => setCcEmails(e.target.value)}
+                    />
+                </Stack>
+            </Stack>
             <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
                 <Button
                     variant="contained"

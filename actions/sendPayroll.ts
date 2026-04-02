@@ -26,10 +26,14 @@ const OUTPUT_DIR = path.join(process.cwd(), 'outputs');
 const JSON_PATH = path.join(process.cwd(), 'data', 'employees.json');
 const EXCEL_PATH = path.join(process.cwd(), 'data', 'employees.xlsx');
 
-export async function processPayrollAndEmail (source: 'json' | 'excel') {
+export async function processPayrollAndEmail (
+    source: 'json' | 'excel',
+    toEmails: string[],
+    ccEmails: string[]
+) {
     try {
-        const { EMAIL_USER, EMAIL_PASS, EMAIL_TO, EMAIL_CC } = process.env;
-        if (!EMAIL_USER || !EMAIL_PASS || !EMAIL_TO) {
+        const { EMAIL_USER, EMAIL_PASS } = process.env;
+        if (!EMAIL_USER || !EMAIL_PASS) {
             return {
                 success: false,
                 error: "Server configuration missing: Please check your .env file."
@@ -46,7 +50,11 @@ export async function processPayrollAndEmail (source: 'json' | 'excel') {
             employees = JSON.parse(rawData);
         } else {
             console.log('Reading from Excel...');
-            const workbook = XLSX.readFile(EXCEL_PATH);
+            const fileBuffer = await fs.readFile(EXCEL_PATH);
+            const workbook = XLSX.read(fileBuffer, {
+                type: 'buffer',
+                cellDates: true
+            });
             const worksheet = workbook.Sheets[workbook.SheetNames[0]];
             const rawRows = XLSX.utils.sheet_to_json(worksheet);
 
@@ -113,8 +121,8 @@ export async function processPayrollAndEmail (source: 'json' | 'excel') {
 
         await transporter.sendMail({
             from: `"Nexspec Payroll" <${EMAIL_USER}>`,
-            to: EMAIL_TO,
-            cc: EMAIL_CC || "", // Added CC support
+            to: toEmails.join(','),
+            cc: ccEmails.join(','),
             subject: `Monthly Payroll Invoices - ${getCurrentMonthAsString()} ${new Date().getFullYear()}`,
             html: `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px;">
