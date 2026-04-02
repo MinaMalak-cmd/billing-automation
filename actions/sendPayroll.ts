@@ -6,9 +6,11 @@ import nodemailer from 'nodemailer';
 import {
     getCurrentMonth,
     calculateTodayDate,
-    calculateInvoiceNo
+    calculateInvoiceNo,
+    getCurrentMonthAsString
 } from '../utils/utils';
 import { Employee } from '../types/types';
+import {cleanDirectory} from "../utils/fileUtils";
 
 /**
  * Server Action to process employee payroll:
@@ -17,28 +19,23 @@ import { Employee } from '../types/types';
  * 3. Emails all invoices as attachments.
  * 4. Cleans up the temporary output directory.
 */
+const DATA_PATH = path.join(process.cwd(), 'data', 'employees.json');
+const TEMPLATE_PATH = path.join(process.cwd(), 'templates', 'invoice.xlsx');
+const OUTPUT_DIR = path.join(process.cwd(), 'outputs');
 
 export async function processPayrollAndEmail () {
     try {
         console.log('Processing Payroll');
-        const { EMAIL_USER, EMAIL_PASS, EMAIL_TO } = process.env;
+        const { EMAIL_USER, EMAIL_PASS, EMAIL_TO, EMAIL_CC } = process.env;
         if (!EMAIL_USER || !EMAIL_PASS || !EMAIL_TO) {
             console.log('Please enter a valid email address', process.env);
             return {
                 success: false,
-                error: "Server configuration missing: Please check your .env.local file."
+                error: "Server configuration missing: Please check your .env file."
             };
         }
 
-        // 2. Define Paths
-        const DATA_PATH = path.join(process.cwd(), 'data', 'employees.json');
-        const TEMPLATE_PATH = path.join(process.cwd(), 'templates', 'invoice.xlsx');
-        const OUTPUT_DIR = path.join(process.cwd(), 'outputs');
-
-        console.log('Creating a missing directory');
-        // 3. Ensure Directories exist & Read Data
         await fs.mkdir(OUTPUT_DIR, { recursive: true });
-        console.log('Creating an empty directory');
 
         const rawData = await fs.readFile(DATA_PATH, 'utf-8');
         const employees: Employee[] = JSON.parse(rawData);
@@ -48,7 +45,6 @@ export async function processPayrollAndEmail () {
         }
         const generatedFiles: string[] = [];
 
-        // 4. Generate Excel Files
         for (const emp of employees) {
             // Load the Excel Template
             const workbook = await XlsxPopulate.fromFileAsync(TEMPLATE_PATH);
@@ -81,20 +77,59 @@ export async function processPayrollAndEmail () {
             await workbook.toFileAsync(filePath);
             generatedFiles.push(filePath);
         }
-        console.log('generatedFiles', generatedFiles);
+
+        const employeeListHtml = employees
+            .map(emp => `<li><strong>${emp.name}</strong> (${emp.email})</li>`)
+            .join('');
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: { user: EMAIL_USER, pass: EMAIL_PASS },
+        });
+
+        await transporter.sendMail({
+            from: `"Nexspec Payroll" <${EMAIL_USER}>`,
+            to: EMAIL_TO,
+            cc: EMAIL_CC || "", // Added CC support
+            subject: `Monthly Payroll Invoices - ${getCurrentMonthAsString()} ${new Date().getFullYear()}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px;">
+                    <h2 style="color: #2e7d32; border-bottom: 2px solid #2e7d32; padding-bottom: 10px;">
+                        Monthly Payroll Report
+                    </h2>
+                    <p>Hello,</p>
+                    <p>The payroll processing for <strong>${getCurrentMonthAsString()}</strong> has been completed successfully.</p>
+                    
+                    <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #2e7d32; margin: 20px 0;">
+                        <p style="margin-top: 0;"><strong>Summary:</strong></p>
+                        <ul style="margin-bottom: 0;">
+                            <li>Total Invoices: ${employees.length}</li>
+                            <li>Date Generated: ${calculateTodayDate()}</li>
+                        </ul>
+                    </div>
+
+                    <p><strong>Processed Recipients:</strong></p>
+                    <ul style="color: #555;">
+                        ${employeeListHtml}
+                    </ul>
+
+                    <p style="font-size: 0.9em; color: #777; margin-top: 30px;">
+                        <em>This is an automated message. All individual invoice sheets are attached to this email.</em>
+                    </p>
+                </div>
+            `,
+            attachments: generatedFiles.map(file => ({
+                filename: path.basename(file),
+                path: file
+            }))
+        });
+
+        // 4. Automatic Cleanup
+        await cleanDirectory(OUTPUT_DIR);
         return {
             success: true,
-            error: "New invoices was successfully created!"
+            message: `Successfully sent ${generatedFiles.length} invoices for ${getCurrentMonthAsString()}.`
         };
-        // 5. Initialize Nodemailer Transporter
-        // const transporter = nodemailer.createTransport({
-        //     service: "gmail",
-        //     auth: {
-        //         user: EMAIL_USER,
-        //         pass: EMAIL_PASS
-        //     },
-        // });
-        console.log("✅ payment sending job finished.");
     } catch (error: unknown) {
         // Proper TypeScript error handling
         const errorMessage = error instanceof Error ? error.message : "An unexpected server error occurred.";
@@ -103,21 +138,4 @@ export async function processPayrollAndEmail () {
     }
 }
 
-async function removeFilesInOutputDirectory() {
-    const OUTPUT_DIR = path.join(process.cwd(), "outputs");
-    if (fs.existsSync(OUTPUT_DIR)) {
-        const files = fs.readdirSync(OUTPUT_DIR);
-        console.log('OUTPUT_DIR', OUTPUT_DIR, files)
-        for (const file of files) {
-            console.log(`Removing file: ${file}`);
-            const filePath = path.join(OUTPUT_DIR, file);
-            const stat = fs.statSync(filePath);
-            if (stat.isFile()) {
-                fs.unlinkSync(filePath);
-            }
-        }
-        console.log("All files in 'outputs/' directory removed successfully.");
-    } else {
-        console.log("Output directory does not exist or OUTPUT_TARGET is not 'local'.");
-    }
-}
+

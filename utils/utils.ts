@@ -46,3 +46,13 @@ export function calculateInvoiceNo(joiningDateString: string): string {
     // Format to 3 digits (e.g., 5 -> "005") to match your UI style
     return totalMonths.toString().padStart(2, '0');
 }
+
+/**
+ * Returns the full name of the current month (e.g., "April")
+ */
+export function getCurrentMonthAsString(): string {
+    const today = new Date();
+
+    // Uses the internationalization API to get the full month name
+    return new Intl.DateTimeFormat('en-US', { month: 'long' }).format(today);
+}
