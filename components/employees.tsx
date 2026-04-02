@@ -15,32 +15,47 @@ import SaveIcon from '@mui/icons-material/Save';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 
 // Local Assets/Actions
-import employeesData from '../data/employees.json';
 import EmployeeDialog from './employeedialog';
-import {Employee} from '../types/types'
+import {Employee} from '../types/empolyee'
 import {saveEmployeesToFile} from '../actions/saveEmployeesToFile';
 import {processPayrollAndEmail} from '../actions/sendPayroll';
+import {fetchEmployees} from "../actions/fetchEmployees";
 
-const formatIndex = (index: number) => {
-    return (index + 1).toString().padStart(3, '0');
-};
+const MODE: 'excel' | 'json' = 'excel';
+
+/**
+ *
+ * @deprecated We no longer use index but employeeId
+ */
+// const formatIndex = (index: number) => {
+//     return (index + 1).toString().padStart(3, '0');
+// };
 
 export default function Employees() {
-    const [employees, setEmployees] = useState<Employee[]>(employeesData);
+    const [employees, setEmployees] = useState<Employee[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-    const [editIndex, setEditIndex] = useState<number | null>(null);
-
-    // --- ALERT STATE ---
+    const [editIndex, setEditIndex] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
         open: false,
         message: '',
         severity: 'success',
     });
+
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            const data = await fetchEmployees(MODE);
+            setEmployees(data);
+            setLoading(false);
+        };
+        loadData();
+    }, []);
+
     const triggerAlert = (message: string, severity: 'success' | 'error' | 'info' = 'success') => {
         setAlert({ open: true, message, severity });
     };
-
     const handleCloseAlert = () => {
         setAlert({ ...alert, open: false });
     };
@@ -49,22 +64,23 @@ export default function Employees() {
         setEditIndex(null);         // Ensure we aren't in edit mode
         setIsModalOpen(true);
     };
-
-    const onDelete = (indexToDelete: number, name: string) => {
+    const onDelete = (id: string, name: string) => {
         const confirmDelete = window.confirm(`Are you sure you want to remove this employee: ${name}?`);
         if (confirmDelete) {
-            const updatedList = employees.filter((_, index) => index !== indexToDelete);
+            const updatedList = employees.filter((employee) => employee.id !== id);
             setEmployees(updatedList);
             triggerAlert(`Employee "${name}" removed from the empolyees list.`, 'info');
         }
     };
-
-    const handleEditClick = (index: number) => {
-        setEditIndex(index);
-        setSelectedEmployee(employees[index]);
-        setIsModalOpen(true);
+    const handleEditClick = (id: string) => {
+        const employeeToEdit = employees.find(emp => emp.id === id);
+        if (employeeToEdit) {
+            setSelectedEmployee(employeeToEdit);
+            // If you still need the array index for updating:
+            setEditIndex(employees.findIndex(emp => emp.id === id));
+            setIsModalOpen(true);
+        }
     };
-
     const handleSaveEmployee = (updatedData: Employee) => {
         if (editIndex !== null) {
             const updatedList = [...employees];
@@ -72,7 +88,8 @@ export default function Employees() {
             setEmployees(updatedList);
             triggerAlert("Employee updated successfully!");
         } else {
-            setEmployees([...employees, updatedData]);
+            let newEmployee = {...updatedData, id: employees.length + 1};
+            setEmployees([...employees, newEmployee]);
             triggerAlert("New employee added to the list!");
         }
         setIsModalOpen(false);
@@ -80,7 +97,9 @@ export default function Employees() {
     };
     const handleSaveToJSON = async () => {
         try {
+            setLoading(true);
             const result = await saveEmployeesToFile(employees);
+            setLoading(false);
             if (result.success) {
                 triggerAlert("JSON file updated successfully!", "success");
             } else {
@@ -91,9 +110,9 @@ export default function Employees() {
         }
     }
     const sendMonthlyPayroll = async () => {
-        triggerAlert("Processing payroll and sending emails...", "info");
+        triggerAlert(`Processing payroll via ${MODE}...`, "info");
         try {
-            const result = await processPayrollAndEmail();
+            const result = await processPayrollAndEmail(MODE);
             if (result?.success) {
                 triggerAlert("Emails sent successfully and outputs cleaned!", "success");
             } else {
@@ -106,7 +125,6 @@ export default function Employees() {
 
     return (
         <>
-            {/* Notification Snackbar */}
             <Snackbar
                 open={alert.open}
                 autoHideDuration={4000}
@@ -131,7 +149,7 @@ export default function Employees() {
                     startIcon={<SaveIcon />}
                     onClick={handleSaveToJSON}
                 >
-                    Save into JSON
+                    {MODE === "excel" ? 'Save into Excel' : 'Save into JSON'}
                 </Button>
                 <Button
                     variant="outlined"
@@ -157,13 +175,13 @@ export default function Employees() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {employees.map((employee, index) => (
+                        {employees.map((employee) => (
                             <TableRow
-                                key={Math.random()}
+                                key={employee.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 <TableCell component="th" scope="row">
-                                    {formatIndex(index)}
+                                    {employee.id}
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     {employee.name}
@@ -179,12 +197,12 @@ export default function Employees() {
                                 </TableCell>
                                 <TableCell align="right">
                                     <Tooltip title="Edit">
-                                        <IconButton onClick={() => handleEditClick(index)} color="primary">
+                                        <IconButton onClick={() => handleEditClick(employee.id)} color="primary">
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="Delete">
-                                        <IconButton onClick={() => onDelete(index, employee.name)} color="error">
+                                        <IconButton onClick={() => onDelete(employee.id, employee.name)} color="error">
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
                                     </Tooltip>

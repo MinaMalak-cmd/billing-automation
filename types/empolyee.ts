@@ -5,4 +5,5 @@ export type Employee = {
     telephone: string
     joiningDate: string
     email: string
+    id: string
 }

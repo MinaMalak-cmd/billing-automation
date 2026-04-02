@@ -5,7 +5,7 @@ import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     Button, TextField, Stack
 } from '@mui/material';
-import { Employee } from '../types/types';
+import { Employee } from '../types/empolyee';
 
 interface Props {
     open: boolean;
@@ -24,7 +24,7 @@ export default function EmployeeDialog({ open, onClose, onSave, initialData }: P
         if (initialData) {
             setFormData(initialData);
         } else {
-            setFormData({ name: '', email: '', salary: 0, telephone: '', address: '', joiningDate: '' });
+            setFormData({ name: '', email: '', salary: 0, telephone: '', address: '', joiningDate: '', id: '' });
         }
     }, [initialData, open]);
 

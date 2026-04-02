@@ -1,5 +1,6 @@
 [
   {
+    "id": 1,
     "name": "Mina Malak",
     "salary": 3000,
     "address": "2 Ahraf Mhna street",
@@ -8,6 +9,7 @@
     "email": "mina3455.malak@nx.com"
   },
   {
+    "id": 2,
     "name": "Sarah Johnson",
     "salary": 2500,
     "address": "45 Park Avenue, New York, NY",
@@ -16,6 +18,7 @@
     "email": "s.johnson@example.com"
   },
   {
+    "id": 3,
     "name": "Robert Chen",
     "salary": 3200,
     "address": "789 Maple Drive, Toronto, ON",
@@ -24,6 +27,7 @@
     "email": "r.chen@globaltech.net"
   },
   {
+    "id": 6,
     "name": "Elena Rodriguez",
     "salary": 2100,
     "address": "Calle Mayor 12, Madrid, ES",
@@ -32,27 +36,12 @@
     "email": "elena.rod@services.io"
   },
   {
+    "id": 7,
     "name": "David Smith",
     "salary": 1950,
     "address": "10 High Street, London, UK",
     "telephone": "442075550987",
     "joiningDate": "2024-03-12",
     "email": "dsmith.payroll@corp.com"
-  },
-  {
-    "name": "mina by json",
-    "email": "mk@gh.com",
-    "salary": "2345",
-    "telephone": "07788",
-    "address": "skdlffjfgkglgjk",
-    "joiningDate": "2026-04-20"
-  },
-  {
-    "name": "Test2Ramy",
-    "email": "kdd@fgg.vlk",
-    "salary": "200",
-    "telephone": "02933849448",
-    "address": "dfkfjggkl",
-    "joiningDate": ""
   }
 ]

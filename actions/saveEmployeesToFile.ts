@@ -1,7 +1,7 @@
 'use server'
 import fs from 'fs/promises';
 import path from 'path';
-import { Employee } from '../types/types';
+import { Employee } from '../types/empolyee';
 
 export async function saveEmployeesToFile(employees: Employee[]) {
     try {

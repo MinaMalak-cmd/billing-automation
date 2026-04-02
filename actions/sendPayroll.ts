@@ -3,13 +3,14 @@ import fs from 'fs/promises';
 import path from 'path';
 import XlsxPopulate from 'xlsx-populate';
 import nodemailer from 'nodemailer';
+import * as XLSX from 'xlsx';
 import {
     getCurrentMonth,
     calculateTodayDate,
     calculateInvoiceNo,
     getCurrentMonthAsString
 } from '../utils/utils';
-import { Employee } from '../types/types';
+import { Employee } from '../types/empolyee';
 import {cleanDirectory} from "../utils/fileUtils";
 
 /**
@@ -22,13 +23,13 @@ import {cleanDirectory} from "../utils/fileUtils";
 const DATA_PATH = path.join(process.cwd(), 'data', 'employees.json');
 const TEMPLATE_PATH = path.join(process.cwd(), 'templates', 'invoice.xlsx');
 const OUTPUT_DIR = path.join(process.cwd(), 'outputs');
+const JSON_PATH = path.join(process.cwd(), 'data', 'employees.json');
+const EXCEL_PATH = path.join(process.cwd(), 'data', 'employees.xlsx');
 
-export async function processPayrollAndEmail () {
+// export async function processPayrollAndEmail (source: 'json' | 'excel') {
     try {
-        console.log('Processing Payroll');
         const { EMAIL_USER, EMAIL_PASS, EMAIL_TO, EMAIL_CC } = process.env;
         if (!EMAIL_USER || !EMAIL_PASS || !EMAIL_TO) {
-            console.log('Please enter a valid email address', process.env);
             return {
                 success: false,
                 error: "Server configuration missing: Please check your .env file."
@@ -37,8 +38,31 @@ export async function processPayrollAndEmail () {
 
         await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
+        let employees: Employee[] = [];
+        // --- FLAG LOGIC: SELECT DATA SOURCE ---
+        if (source === 'json') {
+            console.log('Reading from JSON...');
+            const rawData = await fs.readFile(JSON_PATH, 'utf-8');
+            employees = JSON.parse(rawData);
+        } else {
+            console.log('Reading from Excel...');
+            const workbook = XLSX.readFile(EXCEL_PATH);
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rawRows = XLSX.utils.sheet_to_json(worksheet);
+
+            // Map Excel headers to Employee Interface
+            employees = rawRows.map((row: any) => ({
+                name: row['Employee Name'],
+                email: row['Personal Email'],
+                salary: row['Current Salary'],
+                telephone: row['Personal Number'],
+                address: row['Address'],
+                joiningDate: row['Start Date'] || "",
+                id: row['ID']
+            }));
+        }
+
         const rawData = await fs.readFile(DATA_PATH, 'utf-8');
-        const employees: Employee[] = JSON.parse(rawData);
         console.log('employees ', employees[0]);
         if (!employees || employees.length === 0) {
             return { success: false, error: "The employee list is currently empty." };
