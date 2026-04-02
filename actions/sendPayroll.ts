@@ -26,7 +26,7 @@ const OUTPUT_DIR = path.join(process.cwd(), 'outputs');
 const JSON_PATH = path.join(process.cwd(), 'data', 'employees.json');
 const EXCEL_PATH = path.join(process.cwd(), 'data', 'employees.xlsx');
 
-// export async function processPayrollAndEmail (source: 'json' | 'excel') {
+export async function processPayrollAndEmail (source: 'json' | 'excel') {
     try {
         const { EMAIL_USER, EMAIL_PASS, EMAIL_TO, EMAIL_CC } = process.env;
         if (!EMAIL_USER || !EMAIL_PASS || !EMAIL_TO) {
@@ -159,7 +159,7 @@ const EXCEL_PATH = path.join(process.cwd(), 'data', 'employees.xlsx');
         const errorMessage = error instanceof Error ? error.message : "An unexpected server error occurred.";
         console.error("Payroll Action Error:", error);
         return { success: false, error: errorMessage };
-    }
+    };
 }
 
 

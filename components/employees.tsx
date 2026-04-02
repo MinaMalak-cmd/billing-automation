@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 // Material UI Imports
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -33,6 +33,7 @@ const MODE: 'excel' | 'json' = 'excel';
 
 export default function Employees() {
     const [employees, setEmployees] = useState<Employee[]>([]);
+    console.log('Employees', employees);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
     const [editIndex, setEditIndex] = useState<string | null>(null);
@@ -47,6 +48,7 @@ export default function Employees() {
         const loadData = async () => {
             setLoading(true);
             const data = await fetchEmployees(MODE);
+            console.log('testData', data)
             setEmployees(data);
             setLoading(false);
         };
