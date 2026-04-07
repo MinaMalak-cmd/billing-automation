@@ -1,16 +1,26 @@
-import * as cdk from 'aws-cdk-lib/core';
+import * as cdk from 'aws-cdk-lib';
+import * as amplify from '@aws-cdk/aws-amplify-alpha';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
-export class InfraStack extends cdk.Stack {
+export class PayrollStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const amplifyApp = new amplify.App(this, 'PayrollApp', {
+      sourceCodeProvider: new amplify.GitHubSourceCodeProvider({
+        owner: 'MinaMalak-cmd',
+        repository: 'billing-automation',
+        // GitHub Personal Access Token stored in AWS Secrets Manager
+        oauthToken: cdk.SecretValue.secretsManager('github-token'),
+      }),
+      environmentVariables: {
+        // These will be available to your Next.js Server Actions
+        EMAIL_USER: 'your-email@gmail.com',
+        EMAIL_PASS: cdk.SecretValue.secretsManager('payroll-email-pass').toString(),
+        MODE: 'excel',
+      },
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'InfraQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const mainBranch = amplifyApp.addBranch('main');
   }
 }
